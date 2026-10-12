@@ -84,27 +84,46 @@ for i in range(26):
         f'style="animation-duration:{f(dur)}s,{CICLO}s;animation-delay:-{f(delay)}s,0s"/>'
     )
 
+# Un astro cruza el cielo en media vuelta (media hoja de CICLO) y queda oculto la otra media.
+# El sol arranca en t=0 y la luna 24 s después con el mismo recorrido, así que mientras uno
+# está arriba el otro está bajo el horizonte. El cielo se oscurece con la misma fase.
+HORIZONTE = 290  # y donde el astro toca el horizonte, detrás de las montañas
+RX, RY = 500, 250
+PASOS = 48
+astro_kf = []
+for i in range(PASOS + 1):
+    t = 2 * math.pi * i / PASOS - math.pi / 2
+    x, y = 600 + RX * math.sin(t), HORIZONTE - RY * math.cos(t)
+    visible = 1 if y < HORIZONTE else 0
+    astro_kf.append(f"{f(100 * i / PASOS)}% {{transform:translate({f(x)}px,{f(y)}px);opacity:{visible}}}")
+ASTRO_KF = " ".join(astro_kf)
+
 svg = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{W}" height="{H}" role="img" aria-label="Dark4rest: un bosque oscuro con montañas, un valle y luciérnagas, en un ciclo de día y noche">
 <style>
-  @keyframes noche {{ 0%,30% {{opacity:0}} 45%,80% {{opacity:1}} 95%,100% {{opacity:0}} }}
-  @keyframes ocaso {{ 0%,25% {{opacity:0}} 37% {{opacity:.8}} 48%,78% {{opacity:0}} 88% {{opacity:.6}} 100% {{opacity:0}} }}
-  @keyframes sombra {{ 0%,30% {{opacity:.15}} 45%,80% {{opacity:.6}} 95%,100% {{opacity:.15}} }}
-  @keyframes giro {{ from {{transform:rotate(-45deg)}} to {{transform:rotate(315deg)}} }}
+  @keyframes noche {{ 0% {{opacity:.5}} 6%,44% {{opacity:0}} 50% {{opacity:.5}} 56%,94% {{opacity:1}} 100% {{opacity:.5}} }}
+  @keyframes ocaso {{ 0% {{opacity:.6}} 8%,40% {{opacity:0}} 50% {{opacity:.9}} 60%,92% {{opacity:0}} 100% {{opacity:.6}} }}
+  @keyframes sombra {{ 0% {{opacity:.3}} 6%,44% {{opacity:.04}} 56%,94% {{opacity:.6}} 100% {{opacity:.3}} }}
+  @keyframes astro {{ {ASTRO_KF} }}
   @keyframes flota {{ 0%,100% {{transform:translate(0,0)}} 50% {{transform:translate(6px,-9px)}} }}
   @keyframes niebla {{ 0%,100% {{transform:translateX(-40px)}} 50% {{transform:translateX(40px)}} }}
   @keyframes parpadeo {{ 0%,46%,50%,100% {{transform:scaleY(1)}} 48% {{transform:scaleY(.1)}} }}
   .noche {{ animation: noche {CICLO}s linear infinite }}
   .ocaso {{ animation: ocaso {CICLO}s linear infinite }}
   .sombra {{ animation: sombra {CICLO}s linear infinite }}
-  .astros {{ transform-box: view-box; transform-origin: 600px 560px; animation: giro {CICLO}s linear infinite }}
+  .sol {{ animation: astro {CICLO}s linear infinite }}
+  .luna {{ animation: astro {CICLO}s linear infinite; animation-delay: -{CICLO // 2}s }}
   .lu {{ transform-box: fill-box; animation-name: flota, noche; animation-iteration-count: infinite; animation-timing-function: ease-in-out, linear; filter: url(#brillo) }}
   .niebla {{ animation: niebla 30s ease-in-out infinite }}
   .ojos {{ transform-box: fill-box; transform-origin: center; animation: parpadeo 7s infinite }}
-  @media (prefers-reduced-motion: reduce) {{ * {{ animation-play-state: paused !important }} }}
+  @media (prefers-reduced-motion: reduce) {{
+    * {{ animation: none !important }}
+    .sol {{ transform: translate(600px,40px) }}
+    .luna, .noche, .ocaso, .sombra, .lu {{ display: none }}
+  }}
 </style>
 <defs>
   <linearGradient id="dia" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0" stop-color="#3f6878"/><stop offset="1" stop-color="#b7c5b2"/>
+    <stop offset="0" stop-color="#5a9fc4"/><stop offset="1" stop-color="#dbe8d6"/>
   </linearGradient>
   <linearGradient id="cielo-noche" x1="0" y1="0" x2="0" y2="1">
     <stop offset="0" stop-color="#05070e"/><stop offset="1" stop-color="#18222c"/>
@@ -121,12 +140,14 @@ svg = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{
 <rect class="ocaso" width="{W}" height="260" fill="url(#horizonte)"/>
 <g class="noche" fill="#e9ecf5">{"".join(estrellas)}</g>
 
-<g class="astros">
-  <circle cx="600" cy="80" r="60" fill="url(#halo)"/>
-  <circle cx="600" cy="80" r="22" fill="#f4e2b0"/>
-  <circle cx="600" cy="1040" r="50" fill="url(#halo)"/>
-  <circle cx="600" cy="1040" r="16" fill="#e4e6f2"/>
-  <circle cx="607" cy="1035" r="14" fill="#c7cbe0" fill-opacity=".35"/>
+<g class="sol" style="opacity:0">
+  <circle r="60" fill="url(#halo)"/>
+  <circle r="22" fill="#f4e2b0"/>
+</g>
+<g class="luna" style="opacity:0">
+  <circle r="50" fill="url(#halo)"/>
+  <circle r="16" fill="#e4e6f2"/>
+  <circle cx="7" cy="-5" r="14" fill="#c7cbe0" fill-opacity=".35"/>
 </g>
 
 <path d="{cordillera(232, 88, 2.2, 1)}" fill="#3a5560"/>
