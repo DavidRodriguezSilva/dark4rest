@@ -143,7 +143,7 @@ svg = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" width="{
 {"".join(luciernagas)}
 
 <text x="600" y="372" text-anchor="middle" fill="#eef1ec" font-family="ui-monospace,'JetBrains Mono','IBM Plex Mono',Menlo,Consolas,monospace" font-size="44" font-weight="700" letter-spacing="14">DARK4REST</text>
-<text x="600" y="393" text-anchor="middle" fill="#eef1ec" fill-opacity=".72" font-family="ui-monospace,'IBM Plex Mono',Menlo,Consolas,monospace" font-size="13" letter-spacing="3">herramientas offline · cada una funciona sola</text>
+<text x="600" y="393" text-anchor="middle" fill="#eef1ec" fill-opacity=".72" font-family="ui-monospace,'IBM Plex Mono',Menlo,Consolas,monospace" font-size="13" letter-spacing="3">herramientas offline</text>
 </svg>
 """
 
