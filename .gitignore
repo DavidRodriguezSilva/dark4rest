@@ -1,0 +1,6 @@
+# Cada pieza y cada referencia es su propio repositorio.
+/apps/
+/ref/
+/perfil/
+
+.DS_Store
